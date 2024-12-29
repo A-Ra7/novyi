@@ -1,0 +1,246 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Рождественская Игра</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        #gameCanvas {
+            border: 1px solid red;
+            background: #001933;
+            touch-action: none;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #003366;
+        }
+        #mobileControls {
+            margin-top: 20px;
+            display: none;
+        }
+        .controlBtn {
+            width: 60px;
+            height: 60px;
+            margin: 5px;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            touch-action: none;
+        }
+        #timer {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 768px) {
+            #gameCanvas {
+                width: 90vw;
+                height: 90vw;
+            }
+            #mobileControls {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="timer">Время: 60</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div id="mobileControls">
+        <button class="controlBtn" id="leftBtn">←</button>
+        <button class="controlBtn" id="upBtn">↑</button>
+        <button class="controlBtn" id="rightBtn">→</button>
+        <button class="controlBtn" id="dummy"></button>
+        <button class="controlBtn" id="downBtn">↓</button>
+        <button class="controlBtn" id="dummy2"></button>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const timerElement = document.getElementById('timer');
+        
+        const santaImg = new Image();
+        santaImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjRUQxQzI0IiBkPSJNMzg0IDM1MmMwIDcwLjctNTcuMyAxMjgtMTI4IDEyOHMtMTI4LTU3LjMtMTI4LTEyOHM1Ny4zLTEyOCAxMjgtMTI4czEyOCA1Ny4zIDEyOCAxMjh6Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTI1NiAzMjBjLTE3LjcgMC0zMiAxNC4zLTMyIDMyczE0LjMgMzIgMzIgMzJzMzItMTQuMyAzMi0zMnMtMTQuMy0zMi0zMi0zMnptMTI4LTMyYy0xNy43IDAtMzIgMTQuMy0zMiAzMnMxNC4zIDMyIDMyIDMyIDMyLTE0LjMgMzItMzItMTQuMy0zMi0zMi0zMnptLTI1NiAwYy0xNy43IDAtMzIgMTQuMy0zMiAzMnMxNC4zIDMyIDMyIDMyIDMyLTE0LjMgMzItMzItMTQuMy0zMi0zMi0zMnoiLz48L3N2Zz4=';
+        
+        const presentImg = new Image();
+        presentImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjRkYwMDAwIiBkPSJNOTYgMTkyaDMyMHYzMjBIOTZ6Ii8+PHBhdGggZmlsbD0iI0ZGRkYwMCIgZD0iTTIyNCAxOTJ2MzIwaDE2NFYxOTJ6Ii8+PHBhdGggZmlsbD0iI0ZGMDAwMCIgZD0iTTY0IDk2aDM4NHY5Nkg2NHoiLz48cGF0aCBmaWxsPSIjRkZGRjAwIiBkPSJNMjQwIDk2aDE5MnY5NkgyNDB6Ii8+PC9zdmc+';
+
+        let santa = {
+            x: 175,
+            y: 175,
+            size: 50,
+            speed: 5
+        };
+        
+        let present = {
+            x: Math.random() * (canvas.width - 20),
+            y: Math.random() * (canvas.height - 20),
+            size: 30
+        };
+        
+        let score = 0;
+        let timeLeft = 60;
+        let gameActive = true;
+        let snowflakes = [];
+        
+        // Создаем снежинки
+        for(let i = 0; i < 50; i++) {
+            snowflakes.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speed: Math.random() * 2 + 1
+            });
+        }
+        
+        // Таймер
+        const timer = setInterval(() => {
+            if (timeLeft > 0 && gameActive) {
+                timeLeft--;
+                timerElement.textContent = `Время: ${timeLeft}`;
+            } else if (timeLeft === 0) {
+                gameActive = false;
+                clearInterval(timer);
+                alert(`Игра окончена! Собрано подарков: ${score}`);
+            }
+        }, 1000);
+        
+        // Управление на клавиатуре
+        document.addEventListener('keydown', handleKeyDown);
+        
+        function handleKeyDown(e) {
+            if (gameActive) {
+                moveCharacter(e.key);
+            }
+        }
+        
+        // Мобильное управление
+        const mobileButtons = {
+            'leftBtn': 'ArrowLeft',
+            'rightBtn': 'ArrowRight',
+            'upBtn': 'ArrowUp',
+            'downBtn': 'ArrowDown'
+        };
+        
+        Object.keys(mobileButtons).forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                ['touchstart', 'mousedown'].forEach(eventType => {
+                    btn.addEventListener(eventType, (e) => {
+                        e.preventDefault();
+                        if (gameActive) {
+                            moveCharacter(mobileButtons[btnId]);
+                        }
+                    });
+                });
+            }
+        });
+        
+        function moveCharacter(direction) {
+            switch(direction) {
+                case 'ArrowUp':
+                    if (santa.y > 0) santa.y -= santa.speed;
+                    break;
+                case 'ArrowDown':
+                    if (santa.y < canvas.height - santa.size) santa.y += santa.speed;
+                    break;
+                case 'ArrowLeft':
+                    if (santa.x > 0) santa.x -= santa.speed;
+                    break;
+                case 'ArrowRight':
+                    if (santa.x < canvas.width - santa.size) santa.x += santa.speed;
+                    break;
+            }
+            checkCollision();
+        }
+        
+        function checkCollision() {
+            if (santa.x < present.x + present.size &&
+                santa.x + santa.size > present.x &&
+                santa.y < present.y + present.size &&
+                santa.y + santa.size > present.y) {
+                score++;
+                present.x = Math.random() * (canvas.width - present.size);
+                present.y = Math.random() * (canvas.height - present.size);
+            }
+        }
+        
+        function updateSnow() {
+            snowflakes.forEach(snow => {
+                snow.y += snow.speed;
+                if (snow.y > canvas.height) {
+                    snow.y = 0;
+                    snow.x = Math.random() * canvas.width;
+                }
+            });
+        }
+        
+        function draw() {
+            if (!gameActive) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем снег
+            ctx.fillStyle = 'white';
+            snowflakes.forEach(snow => {
+                ctx.beginPath();
+                ctx.arc(snow.x, snow.y, snow.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Рисуем Санту
+            ctx.drawImage(santaImg, santa.x, santa.y, santa.size, santa.size);
+            
+            // Рисуем подарок
+            ctx.drawImage(presentImg, present.x, present.y, present.size, present.size);
+            
+            // Показываем счет
+            ctx.fillStyle = 'white';
+            ctx.font = '20px Arial';
+            ctx.fillText('Подарки: ' + score, 10, 30);
+            
+            updateSnow();
+            requestAnimationFrame(draw);
+        }
+        
+        // Начинаем игру когда загрузятся изображения
+        Promise.all([
+            new Promise(resolve => santaImg.onload = resolve),
+            new Promise(resolve => presentImg.onload = resolve)
+        ]).then(() => {
+            draw();
+        });
+
+        // Предотвращаем прокрутку страницы на мобильных устройствах
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
+
+
+
+
