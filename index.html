@@ -1,21 +1,7 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Рождественская Игра</title>
+    <title>Игра Новый Год</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         #gameCanvas {
@@ -48,12 +34,45 @@
             font-size: 24px;
             touch-action: none;
         }
-        #timer {
+
+        .title {
             color: rgb(255, 0, 0);
+            text-align: center;
+            margin: 12px;
+        }
+
+        #timer {
+            color: rgb(255, 140, 0);
             font-size: 24px;
             margin-bottom: 10px;
         }
-        @media (max-width: 768px) {
+
+        #victory {
+            position: relative;
+            width: 90%;
+            z-index: 1000;
+            border-radius: 25px;
+            display: none;
+        }
+
+        .game-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ff0000 ;
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all ease 0.3s;
+        }
+
+        .game-button:hover {
+            background: #45a049;
+        }
+
+
+        @media (max-width: 700px) {
             #gameCanvas {
                 width: 90vw;
                 height: 90vw;
@@ -67,8 +86,10 @@
     </style>
 </head>
 <body>
+    <h1 class="title">Соберите все подарки <br> к Новому Году  <br> 🎅 🎄 🎁</h1>
     <div id="timer">Время: 60</div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <img id="victory" src="img/dedmoroz-snegurochka.jpg" alt="">
     <div id="mobileControls">
         <button class="controlBtn" id="leftBtn">←</button>
         <button class="controlBtn" id="upBtn">↑</button>
@@ -77,6 +98,7 @@
         <button class="controlBtn" id="downBtn">↓</button>
         <button class="controlBtn" id="dummy2"></button>
     </div>
+    <button class="game-button" onclick="location.reload()">Начать заново</button>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -101,7 +123,7 @@
             size: 40
         };
         
-        let score = 0;
+        let score = 50;
         let timeLeft = 60;
         let gameActive = true;
         let snowflakes = [];
@@ -124,7 +146,7 @@
             } else if (timeLeft === 0) {
                 gameActive = false;
                 clearInterval(timer);
-                alert(`Игра окончена! Собрано подарков: ${score}`);
+                alert(`Игра окончена! Подарки не собраны: ${score} \n\nПопробуй ещё раз!`);
             }
         }, 1000);
         
@@ -184,7 +206,7 @@
                 santa.x + santa.size > present.x &&
                 santa.y < present.y + present.size &&
                 santa.y + santa.size > present.y) {
-                score++;
+                score--;
                 present.x = Math.random() * (canvas.width - present.size);
                 present.y = Math.random() * (canvas.height - present.size);
             }
@@ -222,10 +244,25 @@
             // Показываем счет
             ctx.fillStyle = 'white';
             ctx.font = '20px Arial';
-            ctx.fillText('Подарки: ' + score, 10, 30);
+            ctx.fillText('Осталось подарок: ' + score, 10, 30);
             
             updateSnow();
             requestAnimationFrame(draw);
+
+            if (score <= 0) {
+                victory();
+            }
+        }
+
+        // Победа
+        function victory() {
+            gameActive = false;
+            clearInterval(timer);
+            const canvas = document.getElementById('gameCanvas');
+            canvas.style.display = 'none';
+            const victory = document.getElementById('victory');
+            victory.style.display = 'block';
+            setTimeout("alert(`Поздравляем! Ты собрал все подарки за ${60 - timeLeft} секунд \n\nС наступающим Новым Годом! \n\n Желаем тебе Счастья, Здоровья, Любви, Удачи и Богатства!`)", 1000); 
         }
         
         // Начинаем игру когда загрузятся изображения
