@@ -13,7 +13,6 @@
         body {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
@@ -36,6 +35,7 @@
         }
 
         .title {
+            font-size: 30px;
             color: rgb(255, 0, 0);
             text-align: center;
             margin: 12px;
@@ -274,9 +274,9 @@
         });
 
         // Предотвращаем прокрутку страницы на мобильных устройствах
-        document.addEventListener('touchmove', function(e) {
-            e.preventDefault();
-        }, { passive: false });
+        // document.addEventListener('touchmove', function(e) {
+        //     e.preventDefault();
+        // }, { passive: false });
     </script>
 </body>
 </html>
