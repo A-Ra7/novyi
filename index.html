@@ -19,9 +19,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         #gameCanvas {
-            border: 1px solid red;
+            border: 2px solid red;
             background: #001933;
             touch-action: none;
+            border-radius: 12px;
         }
         body {
             display: flex;
@@ -30,7 +31,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background: #003366;
+            background: #ffffff;
         }
         #mobileControls {
             margin-top: 20px;
@@ -40,15 +41,15 @@
             width: 60px;
             height: 60px;
             margin: 5px;
-            background: rgba(255,255,255,0.3);
+            background: rgba(177, 177, 177, 0.3);
             border: none;
             border-radius: 50%;
-            color: white;
+            color: rgb(255, 0, 0);
             font-size: 24px;
             touch-action: none;
         }
         #timer {
-            color: white;
+            color: rgb(255, 0, 0);
             font-size: 24px;
             margin-bottom: 10px;
         }
@@ -90,14 +91,14 @@
         let santa = {
             x: 175,
             y: 175,
-            size: 50,
-            speed: 5
+            size: 100,
+            speed: 7
         };
         
         let present = {
             x: Math.random() * (canvas.width - 20),
             y: Math.random() * (canvas.height - 20),
-            size: 30
+            size: 40
         };
         
         let score = 0;
@@ -151,7 +152,9 @@
                     btn.addEventListener(eventType, (e) => {
                         e.preventDefault();
                         if (gameActive) {
-                            moveCharacter(mobileButtons[btnId]);
+                            for (let i = 0; i < 7; i += 1) {
+                                moveCharacter(mobileButtons[btnId]);
+                            };
                         }
                     });
                 });
