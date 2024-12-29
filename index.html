@@ -32,6 +32,12 @@
             color: rgb(255, 0, 0);
             font-size: 24px;
             touch-action: none;
+            transition: all ease 0.2s;
+        }
+
+        .controlBtn:active {
+            background: rgba(255, 0, 0, 0.7);
+            transform: scale(1.1);
         }
 
         .title {
@@ -146,7 +152,10 @@
             } else if (timeLeft === 0) {
                 gameActive = false;
                 clearInterval(timer);
-                alert(`Игра окончена! Подарки не собраны: ${score} \n\nПопробуй ещё раз!`);
+                const mobileControls = document.getElementById('mobileControls');
+                mobileControls.style.display = 'none';
+                
+                setTimeout("alert(`Игра окончена! Подарки не собраны: ${score} \n\nПопробуй ещё раз!`);", 1000); 
             }
         }, 1000);
         
@@ -261,6 +270,8 @@
             const canvas = document.getElementById('gameCanvas');
             canvas.style.display = 'none';
             const victory = document.getElementById('victory');
+            const mobileControls = document.getElementById('mobileControls');
+            mobileControls.style.display = 'none';
             victory.style.display = 'block';
             setTimeout("alert(`Поздравляем! Ты собрал все подарки за ${60 - timeLeft} секунд \n\nС наступающим Новым Годом! \n\nЖелаем тебе Счастья, Здоровья, Любви, Удачи и Богатства!`)", 1000); 
         }
